@@ -6,45 +6,39 @@
 #define N 32 * 1024 * 1024              // 共N个元素进行规约求和
 
 
-__global__ void reduce(float *d_input, float *d_output)
+__global__ void reducev0(float* d_input, float* d_output)
 {
-    // 1、设计block
-    // 3 1 7 0 4 1 6 3
-    // 4   7   5   9
-    // 11      14
-    // 25
-    // 2、为每个block设计一个起始索引  每个Block的第一个元素都是input_begin[0]
-    float *input_begin = d_input + blockIdx.x * blockDim.x;
-    // 3、写代码要从从线程角度思考
-    // if (threadIdx.x == 0 or 2 or 4 or 6)
-    //     input_begin[threadIdx.x] += input_begin[threadIdx.x + 1];
-    // if (threadIdx.x == 0 or 4)
-    //     input_begin[threadIdx.x] += input_begin[threadIdx.x + 2];
-    // if (threadIdx.x == 0)
-    //     input_begin[threadIdx.x] += input_begin[threadIdx.x + 4];
-    // 4、如果线程不是8个，而是很多个呢？所以不能写成if  应该写成for
-    // for (int i = 1; i < blockDim.x; i *= 2)
-    // {
-    //     if (threadIdx.x % (i * 2) == 0)
-    //     {
-    //         input_begin[threadIdx.x] += input_begin[threadIdx.x + i];
-    //     }    
-    // }
+    // 总共N个元素，划分为m个block  每个block N/m个元素
+    // 1、block设计
+    // 1 2 3 4 5 6 7 8
+    // 3   7   11  15
+    // 10      27
+    // 37
+    // 2、block的index设计
+    float* input_begin = d_input + blockIdx.x * blockDim.x;
+    // 3、每个thead的写法  要考虑每个线程的行为
+    // 0 2 4 6线程: input_begin[i] += input_begin[i + 1]
+    // 0 4线程：input_begin[i] += input_begin[i + 2]
+    // 0线程：input_begin[i] += input_begin[i+4]
+    // if (threadIdx.x == 0 or 2 or 4 or 6):
+    //     input_begin[threadIdx.x] += input_begin[threadIdx.x + 1]
+    // if (threadIdx.x == 0 or 4):
+    //     input_begin[threadIdx.x] += input_begin[threadIdx.x + 2]
+    // if (threadIdx.x == 0):
+    //     input_begin[threadIdx.x] += input_begin[threadIdx.x + 4]
+    // 4、如果不是8个线程呢  所以要改成for循环写法
     // 5、同步问题：3+1计算完了，但是如果7+0还没计算完，就计算4+7 那么肯定会出问题
     for (int i = 1; i < blockDim.x; i *= 2)
     {
-        if (threadIdx.x % (i * 2) == 0)
-        {
+        if (threadIdx.x % (2 * i) == 0)
             input_begin[threadIdx.x] += input_begin[threadIdx.x + i];
-        }
         __syncthreads();
     }
 
+    // d_output跟block数量相同
     if (threadIdx.x == 0)
-    {
-        // d_output跟block数量相同
         d_output[blockIdx.x] = input_begin[0];
-    }
+
 }
 
 bool check(float *h_result, float *h_output, int n)
@@ -94,7 +88,7 @@ int main()
     cudaMemcpy(d_input, h_input, N * sizeof(float), cudaMemcpyHostToDevice);
     dim3 Grid(block_num, 1);
     dim3 Block(THREAD_PER_BLOCK, 1);
-    reduce<<<Grid, Block>>>(d_input, d_output);
+    reducev0<<<Grid, Block>>>(d_input, d_output);
     cudaMemcpy(h_output, d_output, (block_num) * sizeof(float), cudaMemcpyDeviceToHost);
 
     // check result
