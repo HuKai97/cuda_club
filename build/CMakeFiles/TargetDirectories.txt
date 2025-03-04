@@ -1,5 +1,0 @@
-/home/hk/code/cuda_club/build/CMakeFiles/edit_cache.dir
-/home/hk/code/cuda_club/build/CMakeFiles/rebuild_cache.dir
-/home/hk/code/cuda_club/build/reduce/CMakeFiles/reduce_v0_global_memory.dir
-/home/hk/code/cuda_club/build/reduce/CMakeFiles/edit_cache.dir
-/home/hk/code/cuda_club/build/reduce/CMakeFiles/rebuild_cache.dir
