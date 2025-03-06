@@ -25,3 +25,9 @@ ctrl + shift + p调出gcc 生成 运行
 float *d_input;
 cudaMalloc((void**)&d_input, N * sizeof(float));
 ```
+
+
+调试方法
+1. ctrl+shift+p调出gcc 生成 + 运行/调试
+2. F5需要先配置launch.json
+3. 安装插件: Nsight Visual Studio Code Edition + launch中修改program路径
