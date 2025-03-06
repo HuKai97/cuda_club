@@ -5,3 +5,11 @@ add_executable(reduce_v0_global_memory
 target_link_libraries(reduce_v0_global_memory PRIVATE
     CUDA::cudart
 )
+
+add_executable(reduce_v1_shared_memory 
+    reduce_v1_shared_memory.cu
+)
+
+target_link_libraries(reduce_v1_shared_memory  PRIVATE
+    CUDA::cudart
+)
