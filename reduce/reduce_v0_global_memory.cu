@@ -85,9 +85,9 @@ int main()
 
     // gpu上计算
     cudaMemcpy(d_input, h_input, N * sizeof(float), cudaMemcpyHostToDevice);
-    dim3 Grid(block_num, 1);
-    dim3 Block(THREAD_PER_BLOCK, 1);
-    reduce_v0<<<Grid, Block>>>(d_input, d_output);
+    dim3 grid_size(block_num);
+    dim3 block_size(THREAD_PER_BLOCK);
+    reduce_v0<<<grid_size, block_size>>>(d_input, d_output);
     cudaMemcpy(h_output, d_output, (block_num) * sizeof(float), cudaMemcpyDeviceToHost);
 
     // check result
