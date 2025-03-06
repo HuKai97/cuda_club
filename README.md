@@ -31,3 +31,12 @@ cudaMalloc((void**)&d_input, N * sizeof(float));
 1. ctrl+shift+p调出gcc 生成 + 运行/调试
 2. F5需要先配置launch.json
 3. 安装插件: Nsight Visual Studio Code Edition + launch中修改program路径
+
+GPU算力计算
+https://www.techpowerup.com/gpu-specs/
+https://www.techpowerup.com/cpu-specs/
+FLOPS 每秒浮点运算次数 = GPU核心数(CORES) * 单核主频(Boost Clock) * CPU单个周期浮点运算能力
+以4060 Ti 8G为例  22.06TFLOPS = 4352  * 2535 MHz * 2 = 22064640 FLOPS
+
+GPU带宽
+一个计算平台每秒所能完成的内存交换量
